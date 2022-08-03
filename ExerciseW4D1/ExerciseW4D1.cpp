@@ -3,6 +3,7 @@
 #include <map>
 #include <limits.h>
 
+#define V 4
 using namespace std;
 
 uint32_t GetNanos();
@@ -12,22 +13,25 @@ void FillArray(int arr[], int size);
 void SelectionSort(int arr[], int size);
 int minDistance(int allEdges[], bool isClosed[],int totalVertices);
 void printSolution(int allEdges[], int dest);
-void dijkstra(int graph[4][4], int src, int dest);
+void AStar(int graph[V][V], int src, int dest);
+void createGraph(int graph[V][V]);
 
 
 int main()
 {
-    cout << "Hello Traveler! Would you like to do Challenge 1 or Challenge 2? ";
+    cout << "Hello Traveler! Nice to see you again.\n Would you like to do Challenge 1 or Challenge 2? ";
     int challenge;
     cin >> challenge;
     cout << '\n';
+    cout << "Great!\n";
 
     uint32_t startNano;
-    uint32_t endNano;;
+    uint32_t endNano;
     int size;
 
-    const int V = 4;
-    int graph[V][V] = { {0,5,0,7},{5,0,1,0},{0,1,0,1},{7,0,1,0} };
+    int graph[V][V];
+    int src;
+    int dest;
     switch (challenge) {
     case 1:
         cout << "We will now use the Selection Sort Algorithm using various array sizes" << endl;
@@ -83,9 +87,17 @@ int main()
         break;
 
     case 2:
-        cout << "We will now use the Dijkstra algorithm" << endl;
+        cout << "We will now use the A* algorithm with Heuristics of 0" << endl;
 
-        dijkstra(graph, 0,3);
+        createGraph(graph);
+        cout << "Great now I need two more things to get you your answer.\n";
+        cout << "\n What is the source? ";
+        cin >> src;
+        cout << "\n What is the destination? ";
+        cin >> dest;
+        cout << '\n';
+
+        AStar(graph, src-1,dest-1);
         break;
 
     default:
@@ -133,7 +145,8 @@ void SelectionSort(int arr[], int size) {
 int minDistance(int allEdges[], bool isClosed[], int totalVertices)
 {
     // Initialize min value
-    int min = INT_MAX, min_index;
+    int min = INT_MAX;
+    int min_index = 0;
 
     for (int v = 0; v < totalVertices; v++)
         if (isClosed[v] == false && allEdges[v] <= min)
@@ -144,12 +157,40 @@ int minDistance(int allEdges[], bool isClosed[], int totalVertices)
 // A utility function to print the constructed distance array
 void printSolution(int allEdges[], int dest)
 {
-    printf("Distance from Source to Destination\n");
+    printf("Perfect! The distance from Source to Destination is ");
     cout << allEdges[dest] << endl;
 }
-void dijkstra(int graph[4][4], int src, int dest)
+void createGraph(int graph[V][V]){
+    //Blank graph
+    for(int x=0;x<V;x++){
+        for (int y= 0; y < V; y++) {
+            graph[x][y] = 0;
+        }
+    }
+
+    cout << "\n How many edges do you have? ";
+    int numEdges;
+    cin >> numEdges;
+    cout << "Legend: 1)a 2)b 3)c 4)d\n";
+    int firstEdge;
+    int secondEdge;
+    int cost;
+    for (int i =0;i<numEdges;i++){
+        cout << "\n What is the first edge?: ";
+        cin >> firstEdge;
+        cout << "\n What is the second edge?: ";
+        cin >> secondEdge;
+        cout << "\n What is the vertex cost?: ";
+        cin >> cost;
+        cout << '\n';
+        graph[firstEdge - 1][secondEdge - 1] = cost;
+        graph[secondEdge - 1][firstEdge - 1] = cost;
+    }
+}
+void AStar(int graph[4][4], int src, int dest)
 {
-    const int V = 4;
+    //Heuristic of 0
+
     int allEdges[V]; // The output array.  Will hold all the lowest paths to all edges
 
     bool isClosed[V]; // isClosed[i] will be true if vertex i is included in shortest
@@ -189,7 +230,7 @@ void dijkstra(int graph[4][4], int src, int dest)
         }
     }
 
-    cout << "Destination Never found. Sorry!" << endl;
+    cout << "Sorry! Destination was never found." << endl;
 }
 
 uint32_t GetNanos() {
